@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import firebase from "firebase";
 
 export default {
@@ -35,15 +36,15 @@ export default {
       firebase
         .auth()
         .signInWithPopup(provider)
-        .then((result) => {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          //var token = result.credential.accessToken;
+        .then(() => {
+					firebase.auth().currentUser.getIdToken(true).then(async (idToken) => {
+						//console.log(idToken);
+						axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
+						this.$router.push("/");
+					}).catch(function(error) {
+						console.log(error);
+					});
 
-          // The signed-in user info.
-          //this.user = result.user;
-          console.log(result.user);
-          this.$router.push("/");
-          // ...
         })
         .catch(function(error) {
           /*

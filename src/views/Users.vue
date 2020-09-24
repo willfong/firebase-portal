@@ -1,50 +1,30 @@
 <template>
   <div class="users">
     <h1>Users</h1>
-    <b-field label="Add New User" grouped>
-      <b-input
-        placeholder="Add New User"
-        type="search"
-        v-model="newUserName"
-      ></b-input>
-      <p class="control">
-        <b-button class="button is-primary" @click="addNewUser">Add</b-button>
-      </p>
-    </b-field>
     <b-table :data="users">
-      <b-table-column field="id" label="ID" width="40" v-slot="props">
-        {{ props.row.id }}
+      <b-table-column field="uid" label="ID" width="40" v-slot="props">
+        {{ props.row.uid }}
       </b-table-column>
-      <b-table-column field="name" label="Name" v-slot="props">
-        <span v-if="props.row.id != modifyingUser">{{ props.row.name }}</span>
-        <b-field
-          v-if="props.row.id == modifyingUser"
-          grouped
-        >
-          <b-input
-            placeholder="Add New User"
-            type="search"
-            v-model="modifiedName"
-          ></b-input>
-          <p class="control">
-            <b-button class="button is-primary" @click="saveNewName"
-              >Save</b-button
-            >
-          </p>
-        </b-field>
+      <b-table-column field="displayName" label="Name" v-slot="props">
+        {{props.row.displayName}}
       </b-table-column>
-      <b-table-column v-slot="props">
+      <b-table-column field="email" label="Email" v-slot="props">
+        {{props.row.email}}
+      </b-table-column>
+      <b-table-column label="Admin" v-slot="props">
         <b-button
-          type="is-success is-light outlined"
-          size="is-small"
-          @click="modifyUser(props.row.id)"
-          >Modify</b-button
-        >
-        <b-button
+          v-if="props.row.customClaims && props.row.customClaims.admin"
           type="is-danger is-light outlined"
           size="is-small"
-          @click="deleteUser(props.row.id)"
-          >Delete</b-button
+          @click="revokeAdmin(props.row.uid)"
+          >Revoke</b-button
+        >
+        <b-button
+          v-if="!props.row.customClaims || !props.row.customClaims.admin"
+          type="is-success is-light outlined"
+          size="is-small"
+          @click="grantAdmin(props.row.uid)"
+          >Grant</b-button
         >
       </b-table-column>
     </b-table>
@@ -52,7 +32,8 @@
 </template>
 
 <script>
-import { FIRESTORE_USERS } from "@/firebase/db";
+import axios from "axios";
+//import { FIRESTORE_USERS } from "@/firebase/db";
 
 export default {
   name: "Users",
@@ -64,10 +45,41 @@ export default {
       modifiedName: null,
     };
   },
+  /*
   firestore: {
     users: FIRESTORE_USERS,
-  },
+	},
+	*/
+  mounted() {
+		this.updateUsers();
+	},
+
   methods: {
+    updateUsers() {
+      axios
+        .get(
+          "http://localhost:5001/poc-firebase-vue-1/us-central1/adminPortal/users"
+        )
+        .then((response) => {
+          this.users = response.data;
+          console.log(response.data);
+        });
+    },
+    async grantAdmin(uid) {
+      await axios.post(
+        "http://localhost:5001/poc-firebase-vue-1/us-central1/adminPortal/users/admin/grant",
+        { uid, admin: true }
+			);
+			this.updateUsers();
+    },
+    async revokeAdmin(uid) {
+      await axios.post(
+        "http://localhost:5001/poc-firebase-vue-1/us-central1/adminPortal/users/admin/grant",
+        { uid, admin: false }
+			);
+			this.updateUsers();
+    },
+    /*
     addNewUser() {
       FIRESTORE_USERS.add({ name: this.newUserName });
       this.newUserName = null;
@@ -89,6 +101,7 @@ export default {
 			this.modifyingUser = null;
 			this.modifiedName = null;
 		}
+		*/
   },
 };
 </script>

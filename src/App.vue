@@ -4,7 +4,7 @@
       <div class="column is-4-tablet is-3-desktop is-2-widescreen">
         <nav class="menu" v-if="user">
           <p class="menu-label">Admin Portal</p>
-          <ul class="menu-list">
+          <ul class="menu-list" v-if="user">
             <li>
               <router-link to="/">
                 <b-icon icon="view-dashboard" size="is-small"> </b-icon>
@@ -46,11 +46,10 @@ export default {
   created() {
     FIREBASE_AUTH.onAuthStateChanged((user) => {
       if (user) {
-        this.user = user;
-        console.log(user);
+        this.user = user; 
       } else {
-        this.$router.push("/login");
-      }
+				this.user = null;
+			}
     });
   },
   methods: {

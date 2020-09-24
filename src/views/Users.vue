@@ -58,7 +58,7 @@ export default {
     updateUsers() {
       axios
         .get(
-          "http://localhost:5001/poc-firebase-vue-1/us-central1/adminPortal/users"
+          "/users"
         )
         .then((response) => {
           this.users = response.data;
@@ -67,14 +67,14 @@ export default {
     },
     async grantAdmin(uid) {
       await axios.post(
-        "http://localhost:5001/poc-firebase-vue-1/us-central1/adminPortal/users/admin/grant",
+        "/users/admin/grant",
         { uid, admin: true }
 			);
 			this.updateUsers();
     },
     async revokeAdmin(uid) {
       await axios.post(
-        "http://localhost:5001/poc-firebase-vue-1/us-central1/adminPortal/users/admin/grant",
+        "/users/admin/grant",
         { uid, admin: false }
 			);
 			this.updateUsers();

@@ -12,7 +12,7 @@ export default {
 	name: 'Home',
 	methods: {
 		async click() {
-			const response = await axios.get("http://localhost:5001/poc-firebase-vue-1/us-central1/adminPortal/");
+			const response = await axios.get("/");
 			console.log(response.data);
 		}
 	}
